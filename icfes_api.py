@@ -40,8 +40,8 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 CORS(app, origins=["*"], methods=["GET", "POST", "OPTIONS"])
 
-# Configuración de API de IA (prioriza variable de entorno, luego fallback)
-GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY") or "AIzaSyDBv91sukUg8BHVLde_1Jf5LjTNUyN4eKE"
+# Configuración de API de IA (prioriza variable de entorno)
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 
 if not GOOGLE_API_KEY:
     logger.error("❌ GOOGLE_API_KEY no encontrada")

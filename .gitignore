@@ -1,0 +1,26 @@
+# Entornos y credenciales
+.env
+*.env
+
+# Cachés de Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Artefactos
+models/
+*.log
+*.sqlite3
+*.db
+
+# Entornos virtuales
+venv/
+.envrc
+.venv/
+
+# OS / IDE
+.DS_Store
+*.swp
+.idea/
+.vscode/
