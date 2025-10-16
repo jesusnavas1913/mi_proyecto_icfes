@@ -7,3 +7,4 @@ python-docx
 matplotlib
 numpy
 gunicorn
+vercel-wsgi
