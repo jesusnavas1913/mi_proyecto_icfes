@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ICFES Pro - Login Unificado</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <style>
+        /* Styles omitted for brevity, same as before */
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loader"></div>
+    </div>
+
+    <!-- Custom Cursor -->
+    <div class="custom-cursor" id="cursor"></div>
+    <div class="cursor-dot" id="cursorDot"></div>
+
+    <!-- Animated Background -->
+    <div class="bg-animated">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <!-- Particles -->
+    <div class="particles" id="particles"></div>
+
+    <div class="grid-overlay"></div>
+
+    <div class="login-container">
+        <div class="login-card magnetic">
+            <div class="login-content">
+                <div class="logo-login">
+                    <h1>ICFES Pro - Login</h1>
+                </div>
+
+                <div class="demo-info">
+                    <h3>Cuentas Demo Disponibles</h3>
+                    <p><strong>Estudiante:</strong> Cédula: 1234567890, Contraseña: demo123</p>
+                    <p><strong>Profesor:</strong> Cédula: 0987654321, Contraseña: prof123</p>
+                </div>
+
+                <div id="alertAuth" class="alert"></div>
+
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="loginCedula">Número de Cédula</label>
+                        <input type="text" id="loginCedula" placeholder="Ingresa tu cédula" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Contraseña</label>
+                        <input type="password" id="loginPassword" placeholder="Ingresa tu contraseña" required />
+                    </div>
+                    <button type="submit" class="btn-login magnetic">Iniciar Sesión</button>
+                    <div class="demo-buttons">
+                        <button type="button" class="btn-demo magnetic" id="fillStudent">Llenar Estudiante Demo</button>
+                        <button type="button" class="btn-demo magnetic" id="fillProfessor">Llenar Profesor Demo</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="{{ url_for('static', filename='js/login-supabase-integration.js') }}"></script>
+</body>
+</html>

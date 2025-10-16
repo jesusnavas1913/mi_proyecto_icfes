@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ICFES Pro - Simulador de Exámenes</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --success: #4ade80;
+            --danger: #f87171;
+            --background: #0a0a0f;
+            --text-light: #fff;
+            --text-muted: rgba(255, 255, 255, 0.7);
+        }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--background);
+            color: var(--text-light);
+            min-height: 100vh;
+            overflow-x: hidden;
+            padding: 0 20px 60px;
+        }
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(10, 10, 15, 0.85);
+            backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 15px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 1000;
+        }
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+        }
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 8px 32px rgba(102, 126, 234, 0.5);
+            color: white;
+        }
+        .logo-text {
+            font-size: 22px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #fff 0%, var(--primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .btn-back {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-light);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .btn-back:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(-3px);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+        main {
+            max-width: 900px;
+            margin: 100px auto 40px;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border-radius: 28px;
+            padding: 40px 50px;
+            box-shadow: 0 0 40px rgba(102, 126, 234, 0.3);
+        }
+        h1 {
+            font-size: 36px;
+            font-weight: 900;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #fff 0%, var(--primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+        }
+        p.subtitle {
+            font-size: 16px;
+            color: var(--text-muted);
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .form-group {
+            margin-bottom: 25px;
+        }
+        label {
+            display: block;
+            font-weight: 700;
+            font-size: 14px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-light);
+        }
+        select, input[type=number] {
+            width: 100%;
+            padding: 14px 18px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-light);
+            font-size: 15px;
+            font-weight: 500;
+            transition: border-color 0.3s ease;
+        }
+        select:focus, input[type=number]:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 10px var(--primary);
+            background: rgba(255, 255, 255, 0.1);
+        }
+        button.btn-primary {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border: none;
+            padding: 18px 0;
+            border-radius: 16px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 15px 50px rgba(102, 126, 234, 0.5);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        button.btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.6s ease;
+        }
+        button.btn-primary:hover::before {
+            left: 100%;
+        }
+        button.btn-primary:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 20px 60px rgba(102, 126, 234, 0.7);
+        }
+        button.btn-primary:active {
+            transform: translateY(-2px) scale(1.02);
+        }
+        .exam-container {
+            margin-top: 40px;
+            display: none;
+            flex-direction: column;
+            gap: 30px;
+        }
+        .exam-container.active {
+            display: flex;
+        }
+        .question-header {
+            font-weight: 700;
+            font-size: 18px;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+        .question-text {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--text-light);
+        }
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .option-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 14px;
+            padding: 18px 25px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .option-item:hover {
+            border-color: var(--primary);
+            background: rgba(102, 126, 234, 0.15);
+        }
+        .option-item.selected {
+            border-color: var(--secondary);
+            background: rgba(118, 75, 162, 0.25);
+        }
+        .option-label {
+            flex: 1;
+            font-size: 16px;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-light);
+            padding: 14px 30px;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-3px);
+            border-color: var(--primary);
+        }
+        .btn-secondary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .timer {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--danger);
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .result-container {
+            display: none;
+            flex-direction: column;
+            gap: 25px;
+            text-align: center;
+        }
+        .result-container.active {
+            display: flex;
+        }
+        .result-title {
+            font-size: 28px;
+            font-weight: 900;
+            color: var(--primary);
+        }
+        .result-summary {
+            font-size: 18px;
+            color: var(--text-muted);
+        }
+        .result-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .result-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+        }
+        .result-card h3 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--secondary);
+        }
+        .result-card p {
+            font-size: 16px;
+            color: var(--text-light);
+        }
+        @media (max-width: 768px) {
+            main {
+                padding: 30px 20px;
+            }
+            .navigation-buttons {
+                flex-direction: column;
+                gap: 15px;
+            }
+            .btn-secondary, button.btn-primary {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo-container" onclick="window.location.href='/dashboard'">
+
+            <div class="logo-icon">🎓</div>
+            <div class="logo-text">ICFES Pro</div>
+        </div>
+        <button class="btn-back" onclick="window.location.href='/dashboard'">← Volver a inicio</button>
+
+    </nav>
+    <main>
+        <h1>Simulador de Exámenes</h1>
+        <p class="subtitle">Configura tu simulacro y pon a prueba tus conocimientos con preguntas generadas por IA.</p>
+        <div id="configForm">
+            <div class="form-group">
+                <label for="subjectSelect">Materia</label>
+                <select id="subjectSelect" required>
+                    <option value="" disabled selected>Selecciona una materia</option>
+                    <option value="Lectura Crítica">Lectura Crítica</option>
+                    <option value="Matemáticas">Matemáticas</option>
+                    <option value="Ciencias Naturales">Ciencias Naturales</option>
+                    <option value="Ciencias Sociales">Ciencias Sociales</option>
+                    <option value="Inglés">Inglés</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="difficultySelect">Nivel de Dificultad</label>
+                <select id="difficultySelect" required>
+                    <option value="facil">Fácil</option>
+                    <option value="medio" selected>Medio</option>
+                    <option value="avanzado">Avanzado</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="numQuestionsInput">Número de Preguntas</label>
+                <input type="number" id="numQuestionsInput" min="1" max="50" value="10" required />
+            </div>
+            <div class="form-group">
+                <label for="timeLimitInput">Tiempo Límite (minutos)</label>
+                <input type="number" id="timeLimitInput" min="1" max="180" value="30" required />
+            </div>
+            <button class="btn-primary" id="startExamBtn">Iniciar Simulacro</button>
+        </div>
+        <div class="exam-container" id="examContainer">
+            <div class="timer" id="timer">Tiempo restante: 00:00</div>
+            <div class="question-header" id="questionHeader"></div>
+            <div class="question-text" id="questionText"></div>
+            <div id="geometryInlineSim" style="margin: 12px 0 8px 0;"></div>
+            <div class="options-list" id="optionsList"></div>
+            <div class="navigation-buttons">
+                <button class="btn-secondary" id="prevQuestionBtn" disabled>← Anterior</button>
+                <button class="btn-secondary" id="nextQuestionBtn" disabled>Siguiente →</button>
+                <button class="btn-primary" id="submitExamBtn" disabled>Finalizar Simulacro</button>
+            </div>
+        </div>
+        <div class="result-container" id="resultContainer">
+            <h2 class="result-title">Resultados del Simulacro</h2>
+            <p class="result-summary" id="resultSummary"></p>
+            <div class="result-details">
+                <div class="result-card">
+                    <h3>Preguntas Totales</h3>
+                    <p id="totalQuestionsResult"></p>
+                </div>
+                <div class="result-card">
+                    <h3>Respuestas Correctas</h3>
+                    <p id="correctAnswersResult"></p>
+                </div>
+                <div class="result-card">
+                    <h3>Respuestas Incorrectas</h3>
+                    <p id="incorrectAnswersResult"></p>
+                </div>
+                <div class="result-card">
+                    <h3>Porcentaje de Éxito</h3>
+                    <p id="successRateResult"></p>
+                </div>
+            </div>
+            <div class="result-card" id="resultChartCard" style="display:none;">
+                <h3>Gráfico de Rendimiento</h3>
+                <div id="resultChart" style="margin-top:10px; text-align:center;"></div>
+            </div>
+            <button class="btn-primary" id="restartExamBtn">Realizar otro simulacro</button>
+        </div>
+    </main>
+    <script>
+        const startBtn = document.getElementById('startExamBtn');
+        const examContainer = document.getElementById('examContainer');
+        const configForm = document.getElementById('configForm');
+        const timerEl = document.getElementById('timer');
+        const questionHeader = document.getElementById('questionHeader');
+        const questionText = document.getElementById('questionText');
+        const optionsList = document.getElementById('optionsList');
+        const prevBtn = document.getElementById('prevQuestionBtn');
+        const nextBtn = document.getElementById('nextQuestionBtn');
+        const submitBtn = document.getElementById('submitExamBtn');
+        const resultContainer = document.getElementById('resultContainer');
+        const resultSummary = document.getElementById('resultSummary');
+        const totalQuestionsResult = document.getElementById('totalQuestionsResult');
+        const correctAnswersResult = document.getElementById('correctAnswersResult');
+        const incorrectAnswersResult = document.getElementById('incorrectAnswersResult');
+        const successRateResult = document.getElementById('successRateResult');
+        const restartBtn = document.getElementById('restartExamBtn');
+
+        let questions = [];
+        let currentIndex = 0;
+        let userAnswers = {};
+        let timerInterval;
+        let timeRemaining;
+
+        function formatTime(seconds) {
+            const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+            const s = (seconds % 60).toString().padStart(2, '0');
+            return `${m}:${s}`;
+        }
+
+        function startTimer(duration) {
+            timeRemaining = duration;
+            timerEl.textContent = `Tiempo restante: ${formatTime(timeRemaining)}`;
+            timerInterval = setInterval(() => {
+                timeRemaining--;
+                timerEl.textContent = `Tiempo restante: ${formatTime(timeRemaining)}`;
+                if (timeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    alert('El tiempo ha finalizado. Se enviará el simulacro automáticamente.');
+                    finishExam();
+                }
+            }, 1000);
+        }
+
+        function stopTimer() {
+            clearInterval(timerInterval);
+        }
+
+        function parseQuestion(rawQuestion) {
+            if (!rawQuestion) return null;
+            const lines = rawQuestion.split('\n').map(l => l.trim()).filter(l => l);
+            let questionText = '', options = [], correctAnswer = '', explanation = '';
+            
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i];
+                if (line.startsWith('Pregunta:')) {
+                    questionText = line.substring(9).trim();
+                    let j = i + 1;
+                    while (j < lines.length && !/^[a-d]\)/i.test(lines[j])) {
+                        questionText += ' ' + lines[j++];
+                    }
+                } else if (/^[a-d]\)/i.test(line)) {
+                    options.push(line);
+                } else if (line.toLowerCase().startsWith('respuesta correcta:')) {
+                    correctAnswer = line.substring(19).trim().toLowerCase();
+                } else if (line.toLowerCase().startsWith('explicación:')) {
+                    explanation = line.substring(12).trim();
+                }
+            }
+            return { questionText, options, correctAnswer, explanation };
+        }
+
+        let geomAbortController = null;
+        let geomDebounceTimer = null;
+
+        function isGeometryQuestion(text) {
+            if (!text) return false;
+            const kw = /(triángulo|triangulo|ángulo|angulo|cuadrado|rectángulo|rectangulo|círculo|circulo|radio|diámetro|diametro|perímetro|perimetro|área|area|eje|coordenadas|polígono|poligono|seno|coseno|tangente|onda|función|funcion)/i;
+            return kw.test(text);
+        }
+
+        async function displayQuestion(index) {
+            const parsed = parseQuestion(questions[index]);
+            if (!parsed) return;
+            questionHeader.textContent = `Pregunta ${index + 1} de ${questions.length}`;
+            questionText.textContent = parsed.questionText;
+            optionsList.innerHTML = '';
+            parsed.options.forEach((option, idx) => {
+                const optionValue = option.charAt(0).toLowerCase();
+                const div = document.createElement('div');
+                div.className = 'option-item';
+                if (userAnswers[index] === optionValue) div.classList.add('selected');
+                div.innerHTML = `
+                    <input type="radio" name="answer" value="${optionValue}" id="opt${idx}" style="display:none;">
+                    <label class="option-label" for="opt${idx}">${option}</label>
+                `;
+                div.onclick = () => {
+                    userAnswers[index] = optionValue;
+                    document.querySelectorAll('.option-item').forEach(el => el.classList.remove('selected'));
+                    div.classList.add('selected');
+                };
+                optionsList.appendChild(div);
+            });
+            prevBtn.disabled = index === 0;
+            nextBtn.disabled = index === questions.length - 1;
+            submitBtn.disabled = Object.keys(userAnswers).length !== questions.length;
+
+            // Auto-generar figura geométrica debajo de la pregunta (solo Matemáticas)
+            if (geomDebounceTimer) clearTimeout(geomDebounceTimer);
+            geomDebounceTimer = setTimeout(() => {
+                generateGeometryInlineSim();
+            }, 200);
+        }
+
+        async function fetchQuestions(subject, numQuestions, difficulty) {
+            const response = await fetch('http://127.0.0.1:5000/generate-question', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ competencia: subject, num_questions: numQuestions, dificultad: difficulty })
+            });
+            if (!response.ok) throw new Error('Error al generar preguntas');
+            const data = await response.json();
+            return data.questions.split(/\n{2,}/).filter(q => q.trim()).slice(0, numQuestions);
+        }
+
+        startBtn.addEventListener('click', async () => {
+            const subject = document.getElementById('subjectSelect').value;
+            const difficulty = document.getElementById('difficultySelect').value;
+            const numQuestions = parseInt(document.getElementById('numQuestionsInput').value);
+            const timeLimit = parseInt(document.getElementById('timeLimitInput').value);
+
+            if (!subject) {
+                alert('Por favor selecciona una materia');
+                return;
+            }
+            if (numQuestions < 1 || numQuestions > 50) {
+                alert('Número de preguntas debe estar entre 1 y 50');
+                return;
+            }
+            if (timeLimit < 1 || timeLimit > 180) {
+                alert('El tiempo límite debe estar entre 1 y 180 minutos');
+                return;
+            }
+
+            startBtn.disabled = true;
+            startBtn.textContent = 'Generando preguntas...';
+
+            try {
+                questions = await fetchQuestions(subject, numQuestions, difficulty);
+                if (questions.length === 0) {
+                    alert('No se generaron preguntas. Intenta con otros parámetros.');
+                    startBtn.disabled = false;
+                    startBtn.textContent = 'Iniciar Simulacro';
+                    return;
+                }
+                userAnswers = {};
+                currentIndex = 0;
+                configForm.style.display = 'none';
+                examContainer.classList.add('active');
+                resultContainer.classList.remove('active');
+                displayQuestion(currentIndex);
+                startTimer(timeLimit * 60);
+            } catch (error) {
+                alert('Error al generar preguntas. Asegúrate de que el backend esté corriendo.');
+                startBtn.disabled = false;
+                startBtn.textContent = 'Iniciar Simulacro';
+            }
+        });
+
+        prevBtn.addEventListener('click', () => {
+            if (currentIndex > 0) {
+                currentIndex--;
+                displayQuestion(currentIndex);
+            }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            if (currentIndex < questions.length - 1) {
+                currentIndex++;
+                displayQuestion(currentIndex);
+            }
+        });
+
+        submitBtn.addEventListener('click', () => {
+            if (Object.keys(userAnswers).length !== questions.length) {
+                alert('Debes responder todas las preguntas antes de finalizar.');
+                return;
+            }
+            finishExam();
+        });
+
+        function finishExam() {
+            stopTimer();
+            examContainer.classList.remove('active');
+            resultContainer.classList.add('active');
+
+            let correctCount = 0;
+            questions.forEach((q, idx) => {
+                const parsed = parseQuestion(q);
+                if (parsed && userAnswers[idx] === parsed.correctAnswer) {
+                    correctCount++;
+                }
+            });
+            const total = questions.length;
+            const incorrectCount = total - correctCount;
+            const successRate = ((correctCount / total) * 100).toFixed(2);
+
+            resultSummary.textContent = `Has respondido correctamente ${correctCount} de ${total} preguntas.`;
+            totalQuestionsResult.textContent = total;
+            correctAnswersResult.textContent = correctCount;
+            incorrectAnswersResult.textContent = incorrectCount;
+            successRateResult.textContent = `${successRate}%`;
+
+            // Generar gráfico con backend
+            const analysisData = `Resultados del simulacro:\n` +
+                `- Total: ${total}\n- Correctas: ${correctCount}\n- Incorrectas: ${incorrectCount}\n- Éxito: ${successRate}%`;
+
+            fetch('http://127.0.0.1:5000/generate-visual', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    chart_type: 'bar',
+                    analysis_data: analysisData,
+                    title: `Rendimiento del Simulacro - ${successRate}%`,
+                    xlabel: 'Categorías',
+                    ylabel: 'Número de Preguntas'
+                })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data && data.success && data.image) {
+                    const img = document.createElement('img');
+                    img.src = data.image;
+                    img.alt = 'Gráfico de rendimiento';
+                    img.style.maxWidth = '100%';
+                    img.style.borderRadius = '12px';
+                    img.style.boxShadow = '0 10px 30px rgba(0,0,0,0.3)';
+                    const chartDiv = document.getElementById('resultChart');
+                    chartDiv.innerHTML = '';
+                    chartDiv.appendChild(img);
+                    document.getElementById('resultChartCard').style.display = 'block';
+                }
+            })
+            .catch(() => {
+                // si falla, no bloquear resultados
+            });
+
+            startBtn.disabled = false;
+            startBtn.textContent = 'Iniciar Simulacro';
+        }
+
+        restartBtn.addEventListener('click', () => {
+            resultContainer.classList.remove('active');
+            configForm.style.display = 'block';
+            userAnswers = {};
+            questions = [];
+            currentIndex = 0;
+        });
+
+        async function generateGeometryInlineSim() {
+            const container = document.getElementById('geometryInlineSim');
+            const competencia = document.getElementById('subjectSelect')?.value || '';
+            const tema = '';
+            const q = questions[currentIndex] || '';
+
+            // Solo intentar si parece una pregunta de geometría o funciones/ondas
+            if ((competencia.toLowerCase() !== 'matemáticas' && competencia.toLowerCase() !== 'matematicas') || !isGeometryQuestion(q)) {
+                container.innerHTML = '';
+                return;
+            }
+
+            // No mostrar loading; solo dibujar si hay éxito
+            try {
+                // Cancelar request anterior si existe
+                if (geomAbortController) geomAbortController.abort();
+                geomAbortController = new AbortController();
+                const resp = await fetch('http://127.0.0.1:5000/generate-geometry-visual', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ question_text: q, title: 'Figura de la Pregunta', competencia, tema }),
+                    signal: geomAbortController.signal
+                });
+                const data = await resp.json();
+                if (resp.ok && data.success && data.image) {
+                    container.innerHTML = `<img alt="Figura geométrica" src="${data.image}" style="max-width:100%; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.3);" />`;
+                } else {
+                    container.innerHTML = '';
+                }
+            } catch (e) {
+                container.innerHTML = '';
+            }
+        }
+    </script>
+</body>
+</html>

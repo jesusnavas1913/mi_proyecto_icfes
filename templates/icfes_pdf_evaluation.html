@@ -1,0 +1,1239 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ICFES Pro - Análisis de Documentos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0a0a0f;
+            min-height: 100vh;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        .bg-animated {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 0;
+            background: 
+                radial-gradient(circle at 10% 20%, rgba(102, 126, 234, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 90% 80%, rgba(249, 147, 251, 0.15) 0%, transparent 50%);
+        }
+
+        .grid-overlay {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(102, 126, 234, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(102, 126, 234, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(10, 10, 15, 0.8);
+            backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 20px 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 1000;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+        }
+
+        .logo-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 8px 32px rgba(102, 126, 234, 0.4);
+        }
+
+        .logo-text {
+            font-size: 24px;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #fff 0%, #a8b2d1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .btn-back {
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .btn-back:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(-3px);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .main-container {
+            position: relative;
+            z-index: 1;
+            max-width: 1600px;
+            margin: 100px auto 40px;
+            padding: 0 60px;
+        }
+
+        .hero-header {
+            text-align: center;
+            margin-bottom: 50px;
+            animation: fadeIn 0.8s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: rgba(102, 126, 234, 0.1);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            padding: 8px 20px;
+            border-radius: 50px;
+            color: #667eea;
+            font-weight: 700;
+            font-size: 12px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+
+        .hero-title {
+            font-size: 48px;
+            font-weight: 900;
+            letter-spacing: -2px;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #ffffff 0%, #667eea 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-subtitle {
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.6);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .upload-section {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 28px;
+            padding: 50px;
+            margin-bottom: 40px;
+            transition: all 0.3s ease;
+        }
+
+        .upload-section:hover {
+            border-color: rgba(102, 126, 234, 0.3);
+        }
+
+        .drop-zone {
+            border: 3px dashed rgba(102, 126, 234, 0.3);
+            border-radius: 20px;
+            padding: 60px 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .drop-zone::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .drop-zone:hover::before,
+        .drop-zone.dragover::before {
+            opacity: 1;
+        }
+
+        .drop-zone:hover {
+            border-color: rgba(102, 126, 234, 0.6);
+            transform: translateY(-5px);
+        }
+
+        .drop-zone.dragover {
+            border-color: var(--success);
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        .upload-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 0 20px rgba(102, 126, 234, 0.5));
+        }
+
+        .upload-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .upload-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+
+        .upload-subtitle {
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 20px;
+        }
+
+        .file-types {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .file-type-badge {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .file-selected {
+            display: none;
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 15px;
+        }
+
+        .file-selected.active {
+            display: block;
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            color: var(--success);
+        }
+
+        .btn-analyze {
+            margin-top: 25px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 16px 40px;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 40px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-analyze:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 50px rgba(102, 126, 234, 0.6);
+        }
+
+        .btn-analyze:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .stats-section {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 25px;
+            margin-bottom: 40px;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+
+        .stats-section.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(102, 126, 234, 0.5);
+            box-shadow: 0 20px 60px rgba(102, 126, 234, 0.3);
+        }
+
+        .stat-icon {
+            font-size: 40px;
+            margin-bottom: 15px;
+        }
+
+        .stat-number {
+            font-size: 42px;
+            font-weight: 900;
+            margin-bottom: 8px;
+        }
+
+        .stat-card:nth-child(1) .stat-number { color: var(--primary); }
+        .stat-card:nth-child(2) .stat-number { color: var(--success); }
+        .stat-card:nth-child(3) .stat-number { color: var(--danger); }
+        .stat-card:nth-child(4) .stat-number { color: var(--warning); }
+
+        .stat-label {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .controls {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            display: none;
+            gap: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .controls.active {
+            display: flex;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .search-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            padding: 14px 20px;
+            border-radius: 12px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .filter-select {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            padding: 14px 20px;
+            border-radius: 12px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .btn-action {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            padding: 14px 24px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-action:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .btn-reset {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.3);
+            color: var(--danger);
+        }
+
+        .btn-reset:hover {
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        .table-container {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+
+        .table-container.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: rgba(102, 126, 234, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        th {
+            padding: 20px;
+            text-align: left;
+            font-weight: 700;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255, 255, 255, 0.9);
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.3s ease;
+        }
+
+        th:hover {
+            background: rgba(102, 126, 234, 0.15);
+        }
+
+        th::after {
+            content: '⇅';
+            margin-left: 10px;
+            opacity: 0.4;
+        }
+
+        th.sort-asc::after {
+            content: '↑';
+            opacity: 1;
+        }
+
+        th.sort-desc::after {
+            content: '↓';
+            opacity: 1;
+        }
+
+        td {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        tbody tr {
+            transition: all 0.3s ease;
+        }
+
+        tbody tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .badge-success {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .badge-danger {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+
+        .btn-details {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-details:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.5);
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 80px 40px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: rgba(10, 10, 15, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            max-width: 900px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 30px 100px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 24px 24px 0 0;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 800;
+            color: white;
+        }
+
+        .close-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            padding: 40px;
+        }
+
+        .detail-section {
+            margin-bottom: 30px;
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .detail-section h3 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-size: 16px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .detail-section p {
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.8;
+        }
+
+        .alert {
+            padding: 16px 24px;
+            border-radius: 12px;
+            margin: 20px 0;
+            font-weight: 600;
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: var(--success);
+        }
+
+        .alert-error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: var(--danger);
+        }
+
+        .alert-info {
+            background: rgba(102, 126, 234, 0.1);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            color: var(--primary);
+        }
+
+        @media (max-width: 1024px) {
+            .main-container {
+                padding: 0 30px;
+            }
+
+            .stats-section {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+
+            .search-box {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 15px 20px;
+            }
+
+            .hero-title {
+                font-size: 32px;
+            }
+
+            .stats-section {
+                grid-template-columns: 1fr;
+            }
+
+            .upload-section {
+                padding: 30px 20px;
+            }
+
+            table {
+                font-size: 13px;
+            }
+
+            th, td {
+                padding: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animated"></div>
+    <div class="grid-overlay"></div>
+
+    <nav class="navbar">
+        <div class="logo-container">
+            <div class="logo-icon">🎓</div>
+            <div class="logo-text">ICFES Pro</div>
+        </div>
+        <button class="btn-back" onclick="window.location.href='/dashboard'">← Volver a inicio</button>
+    </nav>
+
+    <div class="main-container">
+        <div class="hero-header">
+            <div class="hero-badge">Análisis Inteligente con IA</div>
+            <h1 class="hero-title">Análisis de Documentos</h1>
+            <p class="hero-subtitle">Sube tus evaluaciones y obtén retroalimentación detallada impulsada por inteligencia artificial</p>
+        </div>
+
+        <div class="upload-section">
+            <input type="file" id="fileInput" accept=".pdf,.doc,.docx" style="display: none;" onchange="handleFileSelect(event)">
+            <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+                <div class="upload-content">
+                    <div class="upload-icon">📄</div>
+                    <h3 class="upload-title">Arrastra tu archivo aquí</h3>
+                    <p class="upload-subtitle">o haz clic para seleccionar desde tu dispositivo</p>
+                    <div class="file-types">
+                        <span class="file-type-badge">PDF</span>
+                        <span class="file-type-badge">Word</span>
+                        <span class="file-type-badge">DOC/DOCX</span>
+                    </div>
+                </div>
+            </div>
+            <div class="file-selected" id="fileSelected">
+                <div class="file-info">
+                    <span style="font-size: 32px;">✅</span>
+                    <span id="fileName"></span>
+                </div>
+                <button class="btn-analyze" id="btnAnalyze" onclick="uploadFile()">
+                    🚀 Analizar con IA
+                </button>
+            </div>
+            <div id="uploadMessage"></div>
+        </div>
+
+        <div class="stats-section" id="statsSection">
+            <div class="stat-card">
+                <div class="stat-icon">📊</div>
+                <div class="stat-number" id="totalQuestions">0</div>
+                <div class="stat-label">Preguntas</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">✓</div>
+                <div class="stat-number" id="correctAnswers">0</div>
+                <div class="stat-label">Correctas</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">✗</div>
+                <div class="stat-number" id="incorrectAnswers">0</div>
+                <div class="stat-label">Incorrectas</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🎯</div>
+                <div class="stat-number" id="successRate">0%</div>
+                <div class="stat-label">Éxito</div>
+            </div>
+        </div>
+
+        <div class="controls" id="controls">
+            <div class="search-box">
+                <input type="text" class="search-input" id="searchInput" placeholder="🔍 Buscar en preguntas, respuestas o retroalimentación...">
+            </div>
+            <select class="filter-select" id="filterStatus">
+                <option value="all">Todos los estados</option>
+                <option value="correcta">Correctas</option>
+                <option value="incorrecta">Incorrectas</option>
+            </select>
+            <button class="btn-action" onclick="generateVisual()">📊 Generar Gráfico</button>
+            <button class="btn-action" onclick="exportToJSON()">💾 Exportar JSON</button>
+            <button class="btn-action btn-reset" onclick="resetTable()">🔄 Nueva Evaluación</button>
+        </div>
+
+        <div class="table-container" id="tableContainer">
+            <table id="dataTable">
+                <thead>
+                    <tr>
+                        <th onclick="sortTable(0)">N°</th>
+                        <th onclick="sortTable(1)">Pregunta</th>
+                        <th onclick="sortTable(2)">Respuesta Elegida</th>
+                        <th onclick="sortTable(3)">Estado</th>
+                        <th onclick="sortTable(4)">Respuesta Correcta</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <tr>
+                        <td colspan="6" class="no-data">
+                            <div style="font-size: 64px; margin-bottom: 20px;">📊</div>
+                            <h3 style="font-size: 24px; margin-bottom: 10px;">Listo para analizar</h3>
+                            <p>Sube un documento para comenzar el análisis inteligente</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="detailModal" class="modal" onclick="if(event.target === this) closeModal()">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Detalles de la Pregunta</h2>
+                <button class="close-btn" onclick="closeModal()">×</button>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://127.0.0.1:5000';
+        let currentData = [];
+        let sortDirection = {};
+        let selectedFile = null;
+
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, e => {
+                e.preventDefault();
+                e.stopPropagation();
+            });
+        });
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => dropZone.classList.add('dragover'));
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => dropZone.classList.remove('dragover'));
+        });
+
+        dropZone.addEventListener('drop', handleDrop);
+
+        function handleDrop(e) {
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFileSelect({ target: { files: files } });
+            }
+        }
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const allowedTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/msword'];
+            
+            if (!allowedTypes.includes(file.type)) {
+                showMessage('error', 'Tipo de archivo no soportado. Solo PDF o Word (.doc, .docx)');
+                return;
+            }
+
+            if (file.size > 10 * 1024 * 1024) {
+                showMessage('error', 'El archivo es demasiado grande. Máximo 10MB.');
+                return;
+            }
+
+            selectedFile = file;
+            document.getElementById('fileName').textContent = file.name;
+            document.getElementById('fileSelected').classList.add('active');
+            showMessage('success', 'Archivo listo para analizar');
+        }
+
+        async function uploadFile() {
+            if (!selectedFile) {
+                showMessage('error', 'Por favor selecciona un archivo');
+                return;
+            }
+
+            const btnAnalyze = document.getElementById('btnAnalyze');
+            btnAnalyze.disabled = true;
+            btnAnalyze.textContent = 'Analizando con IA...';
+
+            showMessage('info', 'Procesando documento con inteligencia artificial...');
+
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+
+            try {
+                const response = await fetch(`${API_URL}/analyze-document`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    currentData = data.analysis;
+                    renderTable(currentData);
+                    updateStats(currentData);
+                    
+                    document.getElementById('controls').classList.add('active');
+                    document.getElementById('statsSection').classList.add('active');
+                    document.getElementById('tableContainer').classList.add('active');
+                    
+                    showMessage('success', `Análisis completado: ${data.metadata.total_items} preguntas procesadas`);
+                } else {
+                    showMessage('error', data.error || 'Error al procesar el documento');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showMessage('error', 'Error de conexión. Asegúrate de que el backend esté corriendo en http://127.0.0.1:5000');
+            } finally {
+                btnAnalyze.disabled = false;
+                btnAnalyze.textContent = '🚀 Analizar con IA';
+            }
+        }
+
+        function showMessage(type, message) {
+            const messageDiv = document.getElementById('uploadMessage');
+            messageDiv.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+            if (type !== 'success' && type !== 'info') {
+                setTimeout(() => messageDiv.innerHTML = '', 5000);
+            }
+        }
+
+        function renderTable(data) {
+            const tbody = document.getElementById('tableBody');
+            
+            if (data.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="no-data">
+                            <div style="font-size: 64px; margin-bottom: 20px;">🔍</div>
+                            <h3 style="font-size: 24px; margin-bottom: 10px;">No se encontraron resultados</h3>
+                            <p>Intenta con otros filtros de búsqueda</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = data.map(item => {
+                const isCorrect = item.retroalimentacion.toLowerCase().includes('correcto') || 
+                                 item.retroalimentacion.toLowerCase().includes('excelente') ||
+                                 item.retroalimentacion.toLowerCase().includes('perfecto');
+                
+                const statusBadge = isCorrect ? 
+                    '<span class="badge badge-success">✓ Correcta</span>' : 
+                    '<span class="badge badge-danger">✗ Incorrecta</span>';
+
+                return `
+                    <tr>
+                        <td><strong>${item.numero}</strong></td>
+                        <td>${item.pregunta.substring(0, 60)}${item.pregunta.length > 60 ? '...' : ''}</td>
+                        <td>${item.respuesta_elegida}</td>
+                        <td>${statusBadge}</td>
+                        <td>${item.respuesta_correcta.substring(0, 40)}...</td>
+                        <td><button class="btn-details" onclick='showDetails(${JSON.stringify(item).replace(/'/g, "&apos;")})'>Ver Detalles</button></td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function updateStats(data) {
+            const total = data.length;
+            const correct = data.filter(item => 
+                item.retroalimentacion.toLowerCase().includes('correcto') || 
+                item.retroalimentacion.toLowerCase().includes('excelente') ||
+                item.retroalimentacion.toLowerCase().includes('perfecto')
+            ).length;
+            const incorrect = total - correct;
+            const rate = total > 0 ? Math.round((correct / total) * 100) : 0;
+
+            document.getElementById('totalQuestions').textContent = total;
+            document.getElementById('correctAnswers').textContent = correct;
+            document.getElementById('incorrectAnswers').textContent = incorrect;
+            document.getElementById('successRate').textContent = rate + '%';
+        }
+
+        function showDetails(item) {
+            const modal = document.getElementById('detailModal');
+            const modalBody = document.getElementById('modalBody');
+            
+            modalBody.innerHTML = `
+                <div class="detail-section">
+                    <h3>📝 Pregunta ${item.numero}</h3>
+                    <p>${item.pregunta}</p>
+                </div>
+                <div class="detail-section">
+                    <h3>📌 Tu Respuesta</h3>
+                    <p>${item.respuesta_elegida}</p>
+                </div>
+                <div class="detail-section">
+                    <h3>✅ Respuesta Correcta</h3>
+                    <p>${item.respuesta_correcta}</p>
+                </div>
+                <div class="detail-section">
+                    <h3>💬 Retroalimentación</h3>
+                    <p>${item.retroalimentacion}</p>
+                </div>
+                <div class="detail-section">
+                    <h3>⚠️ Errores Comunes</h3>
+                    <p>${item.errores_comunes}</p>
+                </div>
+                <div class="detail-section">
+                    <h3>📚 Sugerencias de Mejora</h3>
+                    <p>${item.sugerencias_mejora}</p>
+                </div>
+                <div class="detail-section">
+                    <h3>🎯 Conceptos Clave</h3>
+                    <p>${item.conceptos_clave}</p>
+                </div>
+            `;
+            
+            modal.classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('detailModal').classList.remove('active');
+        }
+
+        function sortTable(columnIndex) {
+            const table = document.getElementById('dataTable');
+            const th = table.querySelectorAll('th')[columnIndex];
+            
+            table.querySelectorAll('th').forEach(header => {
+                header.classList.remove('sort-asc', 'sort-desc');
+            });
+            
+            const currentDirection = sortDirection[columnIndex] || 'asc';
+            const newDirection = currentDirection === 'asc' ? 'desc' : 'asc';
+            sortDirection[columnIndex] = newDirection;
+            
+            th.classList.add(`sort-${newDirection}`);
+            
+            const sortedData = [...currentData].sort((a, b) => {
+                let aVal, bVal;
+                
+                switch(columnIndex) {
+                    case 0:
+                        aVal = a.numero;
+                        bVal = b.numero;
+                        break;
+                    case 1:
+                        aVal = a.pregunta.toLowerCase();
+                        bVal = b.pregunta.toLowerCase();
+                        break;
+                    case 2:
+                        aVal = a.respuesta_elegida.toLowerCase();
+                        bVal = b.respuesta_elegida.toLowerCase();
+                        break;
+                    case 3:
+                        aVal = a.retroalimentacion.toLowerCase().includes('correcto') ? 1 : 0;
+                        bVal = b.retroalimentacion.toLowerCase().includes('correcto') ? 1 : 0;
+                        break;
+                    case 4:
+                        aVal = a.respuesta_correcta.toLowerCase();
+                        bVal = b.respuesta_correcta.toLowerCase();
+                        break;
+                }
+                
+                if (typeof aVal === 'string') {
+                    return newDirection === 'asc' ? 
+                        aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+                } else {
+                    return newDirection === 'asc' ? aVal - bVal : bVal - aVal;
+                }
+            });
+            
+            renderTable(sortedData);
+        }
+
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const filtered = currentData.filter(item => 
+                item.pregunta.toLowerCase().includes(searchTerm) ||
+                item.respuesta_elegida.toLowerCase().includes(searchTerm) ||
+                item.retroalimentacion.toLowerCase().includes(searchTerm) ||
+                item.respuesta_correcta.toLowerCase().includes(searchTerm)
+            );
+            renderTable(filtered);
+            updateStats(filtered);
+        });
+
+        document.getElementById('filterStatus').addEventListener('change', function(e) {
+            const status = e.target.value;
+            let filtered = currentData;
+            
+            if (status === 'correcta') {
+                filtered = currentData.filter(item => 
+                    item.retroalimentacion.toLowerCase().includes('correcto') ||
+                    item.retroalimentacion.toLowerCase().includes('excelente') ||
+                    item.retroalimentacion.toLowerCase().includes('perfecto')
+                );
+            } else if (status === 'incorrecta') {
+                filtered = currentData.filter(item => 
+                    !(item.retroalimentacion.toLowerCase().includes('correcto') ||
+                    item.retroalimentacion.toLowerCase().includes('excelente') ||
+                    item.retroalimentacion.toLowerCase().includes('perfecto'))
+                );
+            }
+            
+            renderTable(filtered);
+            updateStats(filtered);
+        });
+
+        async function generateVisual() {
+            if (currentData.length === 0) {
+                alert('No hay datos para generar gráfico');
+                return;
+            }
+
+            showMessage('info', 'Generando gráfico con IA...');
+
+            // Calculate detailed statistics for the chart
+            const total = currentData.length;
+            const correct = currentData.filter(item =>
+                item.retroalimentacion.toLowerCase().includes('correcto') ||
+                item.retroalimentacion.toLowerCase().includes('excelente') ||
+                item.retroalimentacion.toLowerCase().includes('perfecto')
+            ).length;
+            const incorrect = total - correct;
+            const successRate = Math.round((correct / total) * 100);
+
+            // Create detailed analysis data for AI
+            const analysisData = `Evaluación ICFES - Estadísticas detalladas:
+- Total de preguntas analizadas: ${total}
+- Respuestas correctas: ${correct} (${Math.round((correct/total)*100)}%)
+- Respuestas incorrectas: ${incorrect} (${Math.round((incorrect/total)*100)}%)
+- Tasa de éxito general: ${successRate}%
+
+Desglose por tipos de respuesta:
+- Correctas: ${correct} preguntas
+- Incorrectas: ${incorrect} preguntas
+
+El estudiante mostró un rendimiento ${successRate >= 70 ? 'bueno' : successRate >= 50 ? 'regular' : 'deficiente'} con ${successRate}% de aciertos.
+Se necesitan mejorar ${incorrect} preguntas que fueron contestadas incorrectamente.`;
+
+            try {
+                const response = await fetch(`${API_URL}/generate-visual`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        chart_type: 'bar',
+                        analysis_data: analysisData,
+                        title: `Análisis de Rendimiento ICFES - ${successRate}% Éxito`,
+                        xlabel: 'Categorías de Evaluación',
+                        ylabel: 'Número de Preguntas'
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    // Open the generated image in a new window
+                    const imageWindow = window.open('', '_blank');
+                    imageWindow.document.write(`
+                        <html>
+                        <head><title>Gráfico Generado - ${successRate}% Éxito</title></head>
+                        <body style="margin:0; display:flex; justify-content:center; align-items:center; min-height:100vh; background:#f0f0f0;">
+                            <img src="${data.image}" style="max-width:90%; max-height:90%; box-shadow:0 0 20px rgba(0,0,0,0.3);" />
+                        </body>
+                        </html>
+                    `);
+                    showMessage('success', 'Gráfico generado exitosamente');
+                } else {
+                    showMessage('error', data.error || 'Error al generar gráfico');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showMessage('error', 'Error de conexión al generar gráfico');
+            }
+        }
+
+        function exportToJSON() {
+            if (currentData.length === 0) {
+                alert('No hay datos para exportar');
+                return;
+            }
+
+            const dataStr = JSON.stringify(currentData, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `retroalimentacion_${new Date().getTime()}.json`;
+            link.click();
+        }
+
+        function resetTable() {
+            if (confirm('¿Estás seguro de que quieres borrar los datos actuales y cargar una nueva evaluación?')) {
+                currentData = [];
+                selectedFile = null;
+                document.getElementById('fileInput').value = '';
+                document.getElementById('fileSelected').classList.remove('active');
+                document.getElementById('controls').classList.remove('active');
+                document.getElementById('statsSection').classList.remove('active');
+                document.getElementById('tableContainer').classList.remove('active');
+                document.getElementById('uploadMessage').innerHTML = '';
+                
+                const tbody = document.getElementById('tableBody');
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="no-data">
+                            <div style="font-size: 64px; margin-bottom: 20px;">📊</div>
+                            <h3 style="font-size: 24px; margin-bottom: 10px;">Listo para analizar</h3>
+                            <p>Sube un documento para comenzar el análisis inteligente</p>
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+    </script>
+</body>
+</html>
